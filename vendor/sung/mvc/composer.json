@@ -1,0 +1,20 @@
+{
+    "name":              "Sung's MVC",
+    "description":       "",
+    "type":              "library",
+    "license":           "MIT",
+    "authors": [
+        {
+            "name":     "Sung",
+            "email":    "sol1000@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sung\\Mvc\\": "src/lib/"
+        }
+    }
+}
