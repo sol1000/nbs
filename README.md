@@ -1,5 +1,8 @@
 # Web Challenge - Sungok Lim
 
+## Challenge Details
+https://gist.github.com/nextbigsound/319f556706936c6aff39f5083055965d
+
 ## Server Environment
 * [Download](https://www.apachefriends.org/download.html)  XAMPP 7.2.2 / PHP 7.2.2 and install
 
