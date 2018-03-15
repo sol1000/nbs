@@ -65,7 +65,7 @@ DB_PASS=
 
 #### Import data
 
-* Import [nextbigsound_2018-03-12.sql](hancube.com/nextbigsound_2018-03-12.sql.zip) into your database.
+* Import [nextbigsound_2018-03-12.sql](http://hancube.com/nextbigsound_2018-03-12.sql.zip) into your database.
 
 ## Challenge Result
 ### Web Challenge #1
