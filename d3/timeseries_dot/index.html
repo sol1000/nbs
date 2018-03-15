@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Timeseries Total with Dot</title>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+    .canvas {
+      background-color: white;
+    }
+    circle {
+      fill: rgba(0, 0, 0, 0.2);
+    }
+    .loading {
+      width: 200px;
+      height: 200px;
+      position: absolute;
+      text-align: center;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #bbb;
+    }
+  </style>
+  <script>
+    var helper = {
+      getQueryString: () => {
+        var i = 0;
+        var telem;
+        var search_values = location.search.replace('\?','').split('&');
+        var query = {};
+        for(i = 0; i < search_values.length; i++){
+          telem = search_values[i].split('=');
+          query[telem[0]] = telem[1];
+        }
+        return query;
+      },
+      getDataURL: () => {
+        var query = helper.getQueryString();
+        var startDate = (typeof query['startDate'] !== 'undefined')? query['startDate'] : '';
+        var endDate = (typeof query['endDate'] !== 'undefined')? query['endDate'] : '';
+        var artistId = (typeof query['artistId'] !== 'undefined')? query['artistId'] : '';
+        return "https://api.nextbigsound.com/artists/" + artistId + "/data?metricIds=11&startDate=" + startDate + "&endDate=" + endDate + "&timeseries=totals,deltas&accessToken=8f6f8a9b1b7c83257922892888218aea";
+      },
+      getColumnNumber: (arr, col) => {
+        for(i = 0; i < arr.length; i++){
+          if (arr[i] == col) return i;
+        }
+        return -1;
+      },
+      hideLoading: () => {
+        d3.select(".loading").attr("style", "display:none");
+      },
+      reformat: (data) => {
+        let reformed = [];
+        let obj = data.data[0].timeseries.totals;
+        for(date in obj){
+          reformed.push({"date": parseTime(date), "value": +obj[date]});
+        }
+        return reformed;
+      }
+    }
+  </script>  
+</head>
+<body>
+<script>
+  // Consts
+  var margin = {top: 50, right: 80, bottom: 100, left: 50};
+  var width = 960;
+  var height = 500;
+  var rMin = 1;
+  var rMax = 20;
+
+  // SVG
+  var svg = d3.select("body")
+              .append("svg")
+              .attr("width", width)
+              .attr("height", height)
+              .attr("class", "canvas");
+  var g = svg.append("g")
+             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  width = width - margin.left - margin.right;
+  height = height - margin.top - margin.bottom;
+
+  var parseTime = d3.timeParse("%Y-%m-%d");
+
+  // Scale
+  var x = d3.scaleTime().range([0, width]);
+  var y = d3.scaleLinear().range([height, 0]);
+  var r = d3.scaleSqrt().range([rMin, rMax]);
+
+  // Loading Image
+  svg.append("foreignObject")
+     .append("xhtml:div")
+     .attr("class", "loading")
+     .attr("style", "left:" + (width/2 - 50) + "px;top:" + (height/2 - 100) + "px;")
+     .html("<img src=\"/d3/shared/loading.gif\"/><br>Please wait...<br>Generating graph...");
+
+  d3.json(helper.getDataURL(), function(error, data) {
+    helper.hideLoading();
+    if (error) throw error;
+
+    // Data reform
+    timeseries = helper.reformat(data);
+
+    // Data range
+    x.domain(d3.extent(timeseries, function(d) {return d.date;}));
+    y.domain(d3.extent(timeseries, function(d) {return d.value;}));
+    r.domain(d3.extent(timeseries, function(d) {return d.value;}));
+
+    // axisLeft
+    g.append("g")
+        .call(d3.axisLeft(y))
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 10)
+        .attr("dy", "0.71em")
+        .attr("fill", "#000")
+        .text("Artist Timeseries Total");
+
+    // axisBottom
+    g.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x)
+                .tickFormat(d3.timeFormat("%Y-%m-%d")))
+        .selectAll("text")  
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-65)");
+
+    // Dots
+    var circles = svg.selectAll("circle")
+                     .data(timeseries)
+                     .enter()
+                   .append("circle")
+                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                     .attr("r", function(d) {return r(d.value);})
+                     .attr("cx", function(d) {return x(d.date);})
+                     .attr("cy", function(d) {return y(d.value);})
+                     .exit()
+                     .remove();
+  });
+</script>
+</body>
+</html>

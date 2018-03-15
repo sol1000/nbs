@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Events with MultiPath</title>
+  <script src="//d3plus.org/js/d3.js"></script>
+  <script src="//d3plus.org/js/d3plus.js"></script>
+  <style>
+    .no_result {
+      display: none;
+    }
+    .loading {
+      width: 200px;
+      height: 200px;
+      position: absolute;
+      text-align: center;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #bbb;
+    }
+  </style>
+  <script>
+    var helper = {
+      data: [],
+      getQueryString: () => {
+        var i=0;
+        var telem;
+        var search_values = location.search.replace('\?','').split('&');
+        var query={};
+        for(i = 0; i < search_values.length; i++){
+          telem = search_values[i].split('=');
+          query[telem[0]] = telem[1];
+        }
+        return query;
+      },
+      getDataURL: () => {
+        var query = helper.getQueryString();
+        var startDate = (typeof query['startDate'] !== 'undefined')? query['startDate'] : '';
+        var endDate = (typeof query['endDate'] !== 'undefined')? query['endDate'] : '';
+        var artistIds = (typeof query['artistIds'] !== 'undefined')? query['artistIds'] : '';
+        return "/events/total/?artistIds=" + artistIds + "&startDate=" + startDate + "&endDate=" + endDate;
+      },
+      hideLoading: () => {
+        d3.select(".loading").attr("style", "display:none");
+      },
+      showNoResult: () => {
+        d3.select(".no_result").attr("style", "display:block");
+      }
+    }
+  </script>  
+</head>
+<body>
+<div class="no_result">No Result</div>
+<script>
+  // Consts
+  var margin = {top: 20, right: 20, bottom: 20, left: 20};
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+
+  var container = d3.select("body")
+              .append("div")
+              .attr("class", "canvas");
+
+  // Loading Image
+  container.append("div")
+     .attr("class", "loading")
+     .attr("style", "left:" + (width/2 - 50) + "px;top:" + (height/2 - 200) + "px;")
+     .html("<img src=\"/d3/shared/loading.gif\"/><br>Please wait...<br>Generating graph...");
+
+  d3.json(helper.getDataURL(), function(error, data) {
+    if (error) throw error;
+    helper.hideLoading();
+
+    if (typeof data.errors !== 'undefined' 
+      && typeof data.errors.code !== 'undefined' 
+      && data.errors.code == 'ERROR_DB_NO_DATA') {
+      helper.showNoResult();
+    }
+
+    // Data reform
+    helper.data = data.map(function(d) {
+      return {
+        value: +d.total_events,
+        name: d.event_type_name,
+        group: d.artist_name
+      };
+    });
+
+    // D3 Plug - Bubble
+    draw();
+  });
+
+  function draw() {
+    container.selectAll("div").remove();
+
+    var visualization = d3plus.viz()
+      .container(".canvas")
+      .data(helper.data)
+      .type("bubbles")
+      .id(["group", "name"])
+      .depth(1)
+      .size("value")
+      .color("group")
+      .draw();
+  }
+  // Event Listener
+  window.addEventListener("resize", draw);
+  
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+    "name": "API",
+    "description": "",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sung",
+            "email": "sol1000@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "vlucas/phpdotenv": "^2.4",
+        "aura/autoload": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7"
+    },
+    "autoload": {
+        "classmap": [
+            "src/",
+            "vendor/sung/mvc/src/"
+        ]
+    },
+    "config": {
+        "process-timeout" : 0
+    },
+    "scripts": {
+        "start": "php -S localhost:8080 -t public index.php",
+        "test": "phpunit"
+    }
+
+}

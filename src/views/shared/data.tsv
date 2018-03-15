@@ -1,0 +1,25 @@
+<?php 
+if (isset($output['errors'])) {
+  // Error
+  echo '['.$output['errors']['code'].'] '.$output['errors']['text'];
+}else {
+  // Column header
+  $first = true;
+  foreach($output[0] as $column => $value) {
+    if ($first) $first = false;
+    else echo "\t";
+    echo $column;
+  }
+  echo "\n";
+
+  // Data
+  foreach($output as $item) {
+    $first = true;
+    foreach($item as $column => $value) {
+      if ($first) $first = false;
+      else echo "\t";
+      echo $value;
+    }
+    echo "\n";
+  }  
+}
