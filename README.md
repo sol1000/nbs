@@ -54,6 +54,11 @@ RewriteRule ^events/total index.php?c=events&a=getTotalEvents [L,QSA]
 RewriteRule ^events/matrix index.php?c=events&a=getDailyMatrix [L,QSA]
 ```
 
+#### Install dependencies
+```
+composer install
+```
+
 ## MySQL
 
 Create a MySQL database with the infomation in the .env file:

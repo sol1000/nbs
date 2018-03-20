@@ -1,9 +1,8 @@
 /logs/*
 !/logs/README.md
 .env
-/tests/
-/tests/*
 /data/
 /data/*
 .htaccess
 .DS_Store
+/vendor/.DS_Store
