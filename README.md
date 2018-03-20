@@ -34,8 +34,14 @@ Include etc/extra/httpd-vhosts.conf
 ```
 127.0.0.1 nextbigsound.solution
 ```
+
 #### Copy the source code
 * Extract `solution.zip` file. A folder will be extracted. Then, locate your web document root and replace it with the extracted folder.
+
+#### Install dependencies
+```
+composer install
+```
 
 #### Create .env file in the root folder
 ```
@@ -52,11 +58,6 @@ RewriteEngine On
 RewriteRule ^events/([^/]+)/stats index.php?c=events&a=getWeeklyEvents&artistId=$1 [L,QSA]
 RewriteRule ^events/total index.php?c=events&a=getTotalEvents [L,QSA]
 RewriteRule ^events/matrix index.php?c=events&a=getDailyMatrix [L,QSA]
-```
-
-#### Install dependencies
-```
-composer install
 ```
 
 ## MySQL
